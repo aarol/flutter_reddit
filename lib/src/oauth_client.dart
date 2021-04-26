@@ -15,49 +15,7 @@ class RedditOAuthClient extends OAuth2Client {
           customUriScheme: customUriScheme,
         );
 
-  Future<AccessTokenResponse> getTokenWithImplicitGrantFlow({
-    required String clientId,
-    List<String>? scopes,
-    bool enableState = true,
-    String? state,
-    httpClient,
-    webAuthClient,
-    Map<String, dynamic>? customParams,
-  }) async {
-    httpClient ??= http.Client();
-    webAuthClient ??= this.webAuthClient;
-
-    if (enableState) state ??= randomAlphaNumeric(25);
-
-    final authorizeUrl = getAuthorizeUrl(
-        clientId: clientId,
-        responseType: 'code',
-        scopes: scopes,
-        enableState: enableState,
-        state: state,
-        redirectUri: redirectUri,
-        customParams: customParams);
-
-    // Present the dialog to the user
-    final result = await webAuthClient.authenticate(
-        url: authorizeUrl, callbackUrlScheme: customUriScheme);
-
-    final fragment = Uri.splitQueryString(Uri.parse(result).fragment);
-
-    if (enableState) {
-      final checkState = fragment['state'];
-      if (state != checkState) {
-        throw Exception(
-            '"state" parameter in response doesn\'t correspond to the expected value');
-      }
-    }
-
-    return AccessTokenResponse.fromMap({
-      'access_token': fragment['access_token'],
-      'token_type': fragment['token_type'],
-      'scope': fragment['scope'] ?? scopes,
-      'expires_in': fragment['expires_in'],
-      'http_status_code': 200
-    });
+  Future<AccessTokenResponse> getTokenWithAppOnlyFlow() async {
+    return AccessTokenResponse.fromMap({});
   }
 }

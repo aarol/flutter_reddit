@@ -15,6 +15,8 @@ class Reddit {
 
   final Dio dio;
 
+  String? _anonymousToken;
+
   Reddit({
     required this.clientId,
     required String redirectUri,
@@ -43,13 +45,25 @@ class Reddit {
   }
 
   Future<void> _prepareForRequest() async {
+    void setHeaders(String token) {
+      dio.options.headers = {'Authorization': 'bearer $token'};
+    }
+
+    // use anonymous token first
+    if (_anonymousToken != null) {}
+    // if it doesnt exist, then check if token not in storage
+    final _token = await oAuthHelper.getTokenFromStorage();
+    if (_token == null || !_token.hasRefreshToken()) {
+      // should get token from appOnly auth
+      oAuthClient.getTokenWithAppOnlyFlow();
+    }
+    // token is in storage and used
     final token = await oAuthHelper.getToken();
-    dio.options.headers = {'Authorization': 'bearer $token'};
+    setHeaders(token!.accessToken!);
   }
 
-  void login() async {
-    final token = await oAuthHelper.fetchToken();
-    print(token.refreshToken);
+  Future<void> login() async {
+    await oAuthHelper.fetchToken();
   }
 
   Future<Response> post(String path,
