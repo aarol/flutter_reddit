@@ -1,4 +1,4 @@
-import 'package:flutter_reddit/const.dart';
+import 'package:flutter_reddit/src/const.dart';
 import 'package:http/http.dart' as http;
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_client.dart';

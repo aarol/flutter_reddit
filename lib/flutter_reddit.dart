@@ -1,3 +1,5 @@
 library flutter_reddit;
 
-export 'reddit.dart';
+export 'src/reddit.dart';
+export 'src/endpoints.dart';
+export 'src/queryParams.dart';
