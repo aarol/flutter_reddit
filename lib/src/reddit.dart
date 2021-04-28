@@ -25,6 +25,7 @@ class Reddit {
     oAuthClient = RedditOAuthClient(
       redirectUri: redirectUri,
       customUriScheme: customUriScheme,
+      storage: oAuthHelper.tokenStorage,
     )..accessTokenRequestHeaders = {
         'authorization': 'Basic ' + base64Encode(utf8.encode('$clientId:')),
       };
