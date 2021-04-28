@@ -5,8 +5,6 @@ import 'package:flutter_reddit/src/const.dart';
 import 'package:flutter_reddit/src/oauth_client.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 
-import 'package:http/http.dart' as http;
-
 class Reddit {
   late final RedditOAuthClient oAuthClient;
   late final OAuth2Helper oAuthHelper;
