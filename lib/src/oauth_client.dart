@@ -21,13 +21,25 @@ class RedditOAuthClient extends OAuth2Client {
           customUriScheme: customUriScheme,
         );
 
-  Future<AccessTokenResponse> getTokenWithAppOnlyFlow() async {
+  Future<AccessTokenResponse> getTokenWithAppOnlyFlow(
+      {required String clientId}) async {
     final deviceId = await _getDeviceId();
 
-    return AccessTokenResponse.fromMap({});
+    final response = await _performAuthorizedRequest(
+        url: tokenUrl,
+        clientId: clientId,
+        params: {
+          'grant_type': 'https://oauth.reddit.com/grants/installed_client',
+          'device_id': deviceId,
+        },
+        headers: {
+          'authorization': 'Basic ' + base64Encode(utf8.encode('$clientId:'))
+        });
+    return http2TokenResponse(response);
   }
 
   // MODIFIED
+  @override
   Future<AccessTokenResponse> refreshToken(String refreshToken,
       {httpClient, required String clientId, String? clientSecret}) async {
     final Map params = getRefreshUrlParams(refreshToken: refreshToken);
