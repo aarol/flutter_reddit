@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_reddit/src/auth/authenticator.dart';
-import 'package:flutter_reddit/src/authEvent.dart';
+import 'package:flutter_reddit/src/auth/authEvent.dart';
 import 'package:flutter_reddit/src/const.dart';
 import 'package:flutter_reddit/src/oauth_client.dart';
 import 'package:flutter_reddit/src/request/requester.dart';
@@ -58,7 +58,7 @@ class Reddit {
         );
 
     // Dio
-    dio.options.contentType = 'application/x-www-form-urlencoded';
+    dio.options.contentType = CONTENT_TYPE;
 
     // Requester
     _requester = Requester(dio);
@@ -81,6 +81,7 @@ class Reddit {
   Stream<AuthEvent> get authState => _authController.stream;
 
   Future<void> login() async {
+    // helper handles everything
     await _helper.fetchToken();
   }
 
@@ -96,8 +97,9 @@ class Reddit {
   Future<Response> _request(
       RequestType type, String path, Map<String, dynamic>? queryParams,
       {dynamic data}) async {
+    //generate url including query parameters (.com?key=value)
     final url = Uri.https(ADDRESS, path, queryParams);
-
+    // callback happens when token is expired and a new one is required
     return _requester.request(type, url, data, () => _authenticator.getToken());
   }
 

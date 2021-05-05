@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_reddit/env/env.dart';
 import 'package:flutter_reddit/flutter_reddit.dart';
-import 'package:flutter_reddit/src/authEvent.dart';
+import 'package:flutter_reddit/src/auth/authEvent.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';

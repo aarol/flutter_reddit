@@ -21,6 +21,12 @@ class RedditOAuthClient extends OAuth2Client {
           customUriScheme: customUriScheme,
         );
 
+  Map<String, String> authHeader(String clientId) {
+    return {
+      'authorization': 'Basic ' + base64Encode(utf8.encode('$clientId:')),
+    };
+  }
+
   Future<AccessTokenResponse> getTokenWithAppOnlyFlow(
       {required String clientId}) async {
     final deviceId = await _getDeviceId();
@@ -32,9 +38,7 @@ class RedditOAuthClient extends OAuth2Client {
           'grant_type': 'https://oauth.reddit.com/grants/installed_client',
           'device_id': deviceId,
         },
-        headers: {
-          'authorization': 'Basic ' + base64Encode(utf8.encode('$clientId:'))
-        });
+        headers: authHeader(clientId));
     return http2TokenResponse(response);
   }
 
@@ -50,9 +54,8 @@ class RedditOAuthClient extends OAuth2Client {
         clientSecret: clientSecret,
         params: params,
         httpClient: httpClient,
-        headers: {
-          'authorization': 'Basic ' + base64Encode(utf8.encode('$clientId:'))
-        });
+        // MODIFIED
+        headers: authHeader(clientId));
 
     return http2TokenResponse(response);
   }
