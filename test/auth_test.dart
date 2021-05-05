@@ -2,15 +2,11 @@ import 'package:flutter_reddit/env/env.dart';
 import 'package:flutter_reddit/flutter_reddit.dart';
 import 'package:flutter_reddit/src/oauth_client.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
-import 'package:oauth2_client/src/token_storage.dart';
-import 'package:oauth2_client/src/storage.dart';
 
-import 'auth_test.mocks.dart';
+import 'generated.mocks.dart';
 
-@GenerateMocks([TokenStorage, Storage])
 void main() {
   late MockTokenStorage mockTokenStorage;
   late MockStorage mockStorage;

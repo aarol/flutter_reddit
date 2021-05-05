@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_reddit/src/auth/authenticator.dart';
 import 'package:flutter_reddit/src/authEvent.dart';
 import 'package:flutter_reddit/src/const.dart';
-import 'package:flutter_reddit/src/enum.dart';
 import 'package:flutter_reddit/src/oauth_client.dart';
+import 'package:flutter_reddit/src/request/requester.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 // ignore: implementation_imports
 import 'package:oauth2_client/src/token_storage.dart';
@@ -13,14 +14,14 @@ import 'package:oauth2_client/src/token_storage.dart';
 class Reddit {
   late final RedditOAuthClient _client;
   late final OAuth2Helper _helper;
+  late final Requester _requester;
+  late final Authenticator _authenticator;
 
   final String clientId;
 
   final Dio dio;
 
   final _authController = StreamController<AuthEvent>()..add(AuthLoading());
-
-  String? _anonymousToken;
 
   Reddit({
     required this.clientId,
@@ -56,39 +57,28 @@ class Reddit {
           tokenStorage: storage,
         );
 
-    // DIO
+    // Dio
     dio.options.contentType = 'application/x-www-form-urlencoded';
+
+    // Requester
+    _requester = Requester(dio);
+
+    // Authenticator
+    _authenticator = Authenticator(_helper, _client, clientId);
+
+    _init();
   }
 
-  Future<String> _getToken() async {
-    late final String token;
-
-    // use anonymous token first
-    if (_anonymousToken != null) {
-      token = _anonymousToken!;
+  void _init() async {
+    await _authenticator.getToken();
+    if (_authenticator.isAnonymous) {
+      _authController.add(AuthLoggedOut());
     } else {
-      // if it doesnt exist, then check if token not in storage
-      final _token = await _helper.getTokenFromStorage();
-      if (_token == null || !_token.hasRefreshToken()) {
-        // should get token from appOnly auth
-        final res = await _client.getTokenWithAppOnlyFlow(
-          clientId: clientId,
-        );
-        // set anonymous token for "caching"
-        _anonymousToken = res.accessToken!;
-        token = res.accessToken!;
-      } else {
-        // token is in storage and used
-        final res = await _helper.getToken();
-
-        token = res!.accessToken!;
-        // set anonymous token to null just in case it wasn't before
-        _anonymousToken = null;
-      }
+      _authController.add(AuthLoggedIn());
     }
-
-    return token;
   }
+
+  Stream<AuthEvent> get authState => _authController.stream;
 
   Future<void> login() async {
     await _helper.fetchToken();
@@ -96,45 +86,19 @@ class Reddit {
 
   Future<Response> post(String path,
       {Map<String, dynamic>? queryParams, dynamic data}) async {
-    final url = Uri.https(ADDRESS, path, queryParams);
-    return _request(RequestType.POST, url, body: data);
+    return _request(RequestType.POST, path, queryParams, data: data);
   }
 
   Future<Response> get(String path, {Map<String, dynamic>? queryParams}) async {
-    // wait until token is present
-
-    final url = Uri.https(ADDRESS, path, queryParams);
-    return _request(RequestType.GET, url);
+    return _request(RequestType.GET, path, queryParams);
   }
 
-  Future<Response> _request(RequestType type, Uri url, {dynamic body}) async {
-    Future<Response> send(String token) async {
-      dio.options.headers = {'Authorization': 'bearer $token'};
-      switch (type) {
-        case RequestType.GET:
-          return dio.getUri(url);
-        case RequestType.POST:
-          return dio.postUri(url, data: body);
-        default:
-          throw '';
-      }
-    }
+  Future<Response> _request(
+      RequestType type, String path, Map<String, dynamic>? queryParams,
+      {dynamic data}) async {
+    final url = Uri.https(ADDRESS, path, queryParams);
 
-    final token = await _getToken();
-
-    late Response res;
-
-    try {
-      res = await send(token);
-    } catch (e) {
-      if (e is DioError) {
-        if (e.response!.statusCode == 401) {
-          //try getting the token again
-          res = await send(await _getToken());
-        }
-      }
-    }
-    return res;
+    return _requester.request(type, url, data, () => _authenticator.getToken());
   }
 
   void dispose() {
