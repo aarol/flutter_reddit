@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_reddit/src/oauth_client.dart';
+import 'package:flutter_reddit/src/auth/oauth_client.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 
 class Authenticator {

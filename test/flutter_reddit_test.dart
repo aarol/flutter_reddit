@@ -20,6 +20,7 @@ void main() {
 
     final tToken = 'tToken';
     final tDeviceId = 'tDeviceId';
+    final tScopes = ['identity', 'vote', 'read'];
 
     setUp(() {
       tokenStorage = MockTokenStorage();
@@ -42,6 +43,7 @@ void main() {
       final reddit = Reddit(
         clientId: Env.client_id,
         redirectUri: Env.redirect_uri,
+        scopes: tScopes,
         customUriScheme: Env.custom_uri_scheme,
         tokenStorage: tokenStorage,
         oAuth2client: client,

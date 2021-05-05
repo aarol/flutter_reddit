@@ -1,6 +1,6 @@
 import 'package:flutter_reddit/env/env.dart';
 import 'package:flutter_reddit/flutter_reddit.dart';
-import 'package:flutter_reddit/src/oauth_client.dart';
+import 'package:flutter_reddit/src/auth/oauth_client.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
@@ -28,6 +28,8 @@ void main() {
     );
   });
   group('anonymous login', () {
+    final tScopes = ['identity', 'vote', 'read'];
+
     test(
       'should complete',
       () async {
@@ -40,6 +42,7 @@ void main() {
         final reddit = Reddit(
           clientId: Env.client_id,
           redirectUri: Env.redirect_uri,
+          scopes: tScopes,
           customUriScheme: Env.custom_uri_scheme,
           oAuth2Helper: helper,
           oAuth2client: client,

@@ -4,7 +4,7 @@
 
 import 'dart:async' as _i10;
 
-import 'package:flutter_reddit/src/oauth_client.dart' as _i13;
+import 'package:flutter_reddit/src/auth/oauth_client.dart' as _i13;
 import 'package:http/src/client.dart' as _i12;
 import 'package:http/src/response.dart' as _i7;
 import 'package:mockito/mockito.dart' as _i1;

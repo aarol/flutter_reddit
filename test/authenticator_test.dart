@@ -2,7 +2,6 @@ import 'package:flutter_reddit/env/env.dart';
 import 'package:flutter_reddit/src/auth/authenticator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:oauth2_client/access_token_response.dart';
 
 import 'generated.mocks.dart';
 
