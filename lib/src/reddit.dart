@@ -80,9 +80,17 @@ class Reddit {
 
   Stream<AuthEvent> get authState => _authController.stream;
 
-  Future<void> login() async {
+  Future<void> logIn() async {
     // helper handles everything
-    await _helper.fetchToken();
+    final token = await _helper.fetchToken();
+    _requester.setToken(token.accessToken!);
+    _authController.add(AuthLoggedIn());
+  }
+
+  Future<void> logOut() async {
+    final token = await await _helper.disconnect();
+    _requester.setToken(await _authenticator.getToken());
+    _authController.add(AuthLoggedOut());
   }
 
   Future<Response> post(String path,
