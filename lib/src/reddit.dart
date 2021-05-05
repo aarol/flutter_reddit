@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_reddit/src/auth/authenticator.dart';
 import 'package:flutter_reddit/src/auth/authEvent.dart';
 import 'package:flutter_reddit/src/const.dart';
-import 'package:flutter_reddit/src/oauth_client.dart';
+import 'package:flutter_reddit/src/auth/oauth_client.dart';
 import 'package:flutter_reddit/src/request/requester.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 // ignore: implementation_imports
@@ -27,6 +27,7 @@ class Reddit {
     required this.clientId,
     required String redirectUri,
     required String customUriScheme,
+    required List<String> scopes,
     Dio? dioClient,
     RedditOAuthClient? oAuth2client,
     OAuth2Helper? oAuth2Helper,
@@ -50,7 +51,7 @@ class Reddit {
         OAuth2Helper(
           _client,
           clientId: clientId,
-          scopes: ['identity', 'read', 'vote'],
+          scopes: scopes,
           authCodeParams: {
             'duration': 'permanent',
           },
@@ -88,7 +89,7 @@ class Reddit {
   }
 
   Future<void> logOut() async {
-    final token = await await _helper.disconnect();
+    await _helper.disconnect();
     _requester.setToken(await _authenticator.getToken());
     _authController.add(AuthLoggedOut());
   }
