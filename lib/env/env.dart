@@ -11,6 +11,9 @@ CUSTOM_URI_SCHEME=
 
 2. Copy the above values to a .env file at the root of the project
 
+CUSTOM_URI_SCHEME is the part before ://
+(example://app/) --> example
+
 /flutter_reddit
   /lib
   /test

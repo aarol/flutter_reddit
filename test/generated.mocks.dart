@@ -392,6 +392,10 @@ class MockRedditOAuthClient extends _i1.Mock implements _i13.RedditOAuthClient {
       super.noSuchMethod(Invocation.setter(#accessTokenRequestHeaders, headers),
           returnValueForMissingStub: null);
   @override
+  Map<String, String> authHeader(String? clientId) =>
+      (super.noSuchMethod(Invocation.method(#authHeader, [clientId]),
+          returnValue: <String, String>{}) as Map<String, String>);
+  @override
   _i10.Future<_i3.AccessTokenResponse> getTokenWithAppOnlyFlow(
           {String? clientId}) =>
       (super.noSuchMethod(
