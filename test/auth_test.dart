@@ -55,4 +55,31 @@ void main() {
       },
     );
   });
+  group('credential login', () {
+    test('should complete', () async {
+      // arrange
+      when(mockTokenStorage.getToken(any)).thenAnswer((_) async => null);
+      when(mockTokenStorage.storage).thenReturn(mockStorage);
+      when(mockStorage.read('deviceId')).thenAnswer((_) async => null);
+      when(mockStorage.write(any, any)).thenAnswer((_) async => null);
+
+      // act
+      final reddit = Reddit.script(
+        scopes: ['identity'],
+        clientSecret: Env.confidential_secret,
+        clientId: Env.confidential_id,
+        tokenStorage: mockTokenStorage,
+      );
+      // assert
+      await expectLater(
+        reddit.authState,
+        emitsInOrder([
+          AuthLoading(),
+          AuthScriptLogin(),
+        ]),
+      );
+      final me = await reddit.get(Endpoints.me);
+      await expectLater(me.data['name'], isNotNull);
+    });
+  });
 }

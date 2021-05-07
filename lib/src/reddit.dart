@@ -19,7 +19,7 @@ class Reddit {
 
   final String clientId;
 
-  final Dio dio;
+  final Dio _dio;
 
   final _authController = StreamController<AuthEvent>()..add(AuthLoading());
 
@@ -32,7 +32,7 @@ class Reddit {
     RedditOAuthClient? oAuth2client,
     OAuth2Helper? oAuth2Helper,
     TokenStorage? tokenStorage,
-  }) : dio = dioClient ?? Dio() {
+  }) : _dio = dioClient ?? Dio() {
     final storage = tokenStorage ?? TokenStorage(TOKEN_URL);
 
     // OAuthClient
@@ -59,10 +59,10 @@ class Reddit {
         );
 
     // Dio
-    dio.options.contentType = CONTENT_TYPE;
+    _dio.options.contentType = CONTENT_TYPE;
 
     // Requester
-    _requester = Requester(dio);
+    _requester = Requester(_dio);
 
     // Authenticator
     _authenticator = Authenticator(_helper, _client, clientId);
@@ -73,10 +73,55 @@ class Reddit {
   void _init() async {
     await _authenticator.getToken();
     if (_authenticator.isAnonymous) {
-      _authController.add(AuthLoggedOut());
+      _authController.add(AuthAnonymousLogin());
     } else {
-      _authController.add(AuthLoggedIn());
+      _authController.add(AuthUserLogin());
     }
+  }
+
+  Reddit.script({
+    required List<String> scopes,
+    required String clientSecret,
+    required this.clientId,
+    Dio? dioClient,
+    TokenStorage? tokenStorage,
+  }) : _dio = dioClient ?? Dio() {
+    final storage = tokenStorage ?? TokenStorage(TOKEN_URL);
+
+    // Client
+    _client = RedditOAuthClient(
+      redirectUri: '',
+      customUriScheme: '',
+      storage: storage,
+    )..accessTokenRequestHeaders = {
+        'authorization': 'Basic ' + base64Encode(utf8.encode('$clientId:')),
+      };
+
+    // Helper
+    _helper = OAuth2Helper(
+      _client,
+      clientId: clientId,
+      grantType: OAuth2Helper.CLIENT_CREDENTIALS,
+      clientSecret: clientSecret,
+      tokenStorage: storage,
+      scopes: scopes,
+    );
+
+    // Dio
+    _dio.options.contentType = CONTENT_TYPE;
+
+    // Requester
+    _requester = Requester(_dio);
+
+    // Authenticator
+    _authenticator = Authenticator(_helper, _client, clientId);
+
+    _initScript();
+  }
+
+  Future<void> _initScript() async {
+    await _helper.getToken();
+    _authController.add(AuthScriptLogin());
   }
 
   Stream<AuthEvent> get authState => _authController.stream;
@@ -85,13 +130,13 @@ class Reddit {
     // helper handles everything
     final token = await _helper.fetchToken();
     _requester.setToken(token.accessToken!);
-    _authController.add(AuthLoggedIn());
+    _authController.add(AuthUserLogin());
   }
 
   Future<void> logOut() async {
     await _helper.disconnect();
     _requester.setToken(await _authenticator.getToken());
-    _authController.add(AuthLoggedOut());
+    _authController.add(AuthAnonymousLogin());
   }
 
   Future<Response> post(String path,

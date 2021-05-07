@@ -7,6 +7,8 @@ abstract class AuthEvent extends Equatable {
 
 class AuthLoading extends AuthEvent {}
 
-class AuthLoggedIn extends AuthEvent {}
+class AuthUserLogin extends AuthEvent {}
 
-class AuthLoggedOut extends AuthEvent {}
+class AuthScriptLogin extends AuthEvent {}
+
+class AuthAnonymousLogin extends AuthEvent {}

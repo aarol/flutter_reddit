@@ -29,7 +29,7 @@ void main() {
       client = MockRedditOAuthClient();
       dio = MockDio();
     });
-    test('from loading to loggedOut', () {
+    test('anonymous when no user present', () {
       // arrange
       when(tokenStorage.getToken(any)).thenAnswer((_) async => tokenResponse);
       when(tokenResponse.hasRefreshToken()).thenReturn(false);
@@ -56,7 +56,7 @@ void main() {
         emitsInOrder(
           [
             AuthLoading(),
-            AuthLoggedOut(),
+            AuthAnonymousLogin(),
           ],
         ),
       );
