@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 
-import 'generated.mocks.dart';
+import '../generated.mocks.dart';
 
 void main() {
   late MockTokenStorage mockTokenStorage;

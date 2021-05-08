@@ -109,7 +109,6 @@ class RedditOAuthClient extends OAuth2Client {
     if (token != null) {
       return token;
     } else {
-      print('generated device ID for authentication');
       final token = Uuid().v1();
       storage.storage.write('deviceId', token);
       return token;
