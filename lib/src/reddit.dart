@@ -73,9 +73,9 @@ class Reddit {
   void _init() async {
     await _authenticator.getToken();
     if (_authenticator.isAnonymous) {
-      _authController.add(AuthLoggedOut());
+      _authController.add(AuthAnonymousLogin());
     } else {
-      _authController.add(AuthLoggedIn());
+      _authController.add(AuthUserLogin());
     }
   }
 
@@ -85,13 +85,13 @@ class Reddit {
     // helper handles everything
     final token = await _helper.fetchToken();
     _requester.setToken(token.accessToken!);
-    _authController.add(AuthLoggedIn());
+    _authController.add(AuthUserLogin());
   }
 
   Future<void> logOut() async {
     await _helper.disconnect();
     _requester.setToken(await _authenticator.getToken());
-    _authController.add(AuthLoggedOut());
+    _authController.add(AuthAnonymousLogin());
   }
 
   Future<Response> post(String path,

@@ -56,7 +56,7 @@ void main() {
         emitsInOrder(
           [
             AuthLoading(),
-            AuthLoggedOut(),
+            AuthAnonymousLogin(),
           ],
         ),
       );
